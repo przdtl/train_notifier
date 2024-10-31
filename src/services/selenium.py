@@ -1,4 +1,3 @@
-import pprint
 import datetime
 
 from urllib.parse import urlparse
@@ -32,6 +31,18 @@ class TrainInfo(BaseModel):
     trip_time: str
     departure_station: Station
     arrival_station: Station
+
+
+class Ticket(BaseModel):
+    position: str
+    number: PositiveInt
+
+
+class Carriage(BaseModel):
+    number: str
+    category: str
+    price: str
+    tickets: list[Ticket]
 
 
 class TutuParser:
@@ -76,7 +87,6 @@ class TutuParser:
         except TimeoutException:
             return []
 
-        print(f'{departure_hinting_element.text=}')
         departure_hinting_element.click()
 
         arrival_station_input.send_keys(arrival_st)
@@ -87,7 +97,6 @@ class TutuParser:
             )
         except TimeoutException:
             return []
-        print(f'{arrival_hinting_element.text=}')
         arrival_hinting_element.click()
 
         date_input.send_keys(date.strftime('%d.%m.%Y'))
@@ -130,12 +139,9 @@ class TutuParser:
 
             trains_info_list.append(train_info)
 
-        self._close_browser()
+        # self._close_browser()
 
         return trains_info_list
-
-    def get_tickets_list(self, url: HttpUrl) -> list:
-        pass
 
     def _parse_train(self, train: WebElement) -> TrainInfo:
         parsed_url = urlparse(self.__driver.current_url)
@@ -178,7 +184,6 @@ class TutuParser:
                 (By.XPATH, settings.TUTURU_URL.XPATH.TRAIN_PAGE.HEADER))
         )
         train_page_url = self.__driver.current_url
-        print(train_page_url)
         self._close_tab()
         self.__driver.switch_to.window(original_window)
 
@@ -187,8 +192,67 @@ class TutuParser:
             train_page_url=AnyUrl(train_page_url),
         )
 
-    def _parse_carriage(self) -> None:
-        pass
+    def get_tickets_list(self, url: HttpUrl) -> list[Carriage]:
+        self._open_page(url)
+        try:
+            WebDriverWait(self.__driver, 5).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, settings.TUTURU_URL.XPATH.TRAIN_PAGE.HEADER))
+            )
+        except TimeoutException:
+            return []
 
-    def _parse_specific_carriage_class(self) -> None:
-        pass
+        category_list = self.__driver.find_elements(
+            By.XPATH, settings.TUTURU_URL.XPATH.TRAIN_PAGE.CATEGORY_LIST
+        )
+        carriages = []
+        for carriage_category in category_list:
+            category_title = carriage_category.find_element(
+                By.XPATH, 'span'
+            ).text
+            carriages_list = carriage_category.find_elements(
+                By.XPATH, 'div/div')
+
+            for carriage in carriages_list:
+                carriage_number = carriage.find_element(
+                    By.XPATH, settings.TUTURU_URL.XPATH.TRAIN_PAGE.CARRIAGE_NUMBER
+                ).text
+                carriage_prices = carriage.find_elements(
+                    By.XPATH, settings.TUTURU_URL.XPATH.TRAIN_PAGE.CARRIAGE_PRICE
+                )
+                cat_carriage_price = ''.join(
+                    [price.text for price in carriage_prices]
+                )
+                carriages.append(Carriage(
+                    price=cat_carriage_price,
+                    number=carriage_number,
+                    category=category_title,
+                    tickets=self._parse_carriage(carriage),
+                ))
+
+        return carriages
+
+    def _parse_carriage(self, carriage: WebElement) -> list[Ticket]:
+        tickets = []
+        show_seats_button = carriage.find_element(
+            By.XPATH, settings.TUTURU_URL.XPATH.TRAIN_PAGE.OPEN_CARRIAGE_INFO_BUTTON
+        )
+        self.__driver.execute_script(
+            "arguments[0].click();", show_seats_button)
+        seats = carriage.find_elements(
+            By.XPATH, settings.TUTURU_URL.XPATH.TRAIN_PAGE.SEAT_ITEM
+        )
+        for seat in seats:
+            ti_type = seat.get_attribute('data-ti-type')
+            ti_state = seat.get_attribute('data-ti-state')
+            ti_seat = seat.get_attribute('data-ti-seat')
+
+            if not all((ti_type, ti_state, ti_seat)) or ti_state != 'active':
+                continue
+
+            tickets.append(Ticket(
+                position='верхнее' if ti_type == 'top' else 'нижнее',
+                number=int(ti_seat),  # type: ignore
+            ))
+
+        return tickets

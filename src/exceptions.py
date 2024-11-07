@@ -1,0 +1,2 @@
+class NoTicketsTrain(Exception):
+    pass

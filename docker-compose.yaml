@@ -1,0 +1,51 @@
+services:
+  app:
+    build: .
+    container_name: TrainNotifierApp
+    command: 'python ./src/main.py'
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+      - celery_redis
+
+  mongo:
+    image: mongo:8.0.3
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: 11111
+    volumes:
+      - mongo_data:/data/db
+    expose:
+      - 27017
+
+  celery_redis:
+    image: redis:alpine
+    expose:
+      - 6379
+    restart: always
+
+  celery_worker:
+    build: .
+    command: > 
+      sh -c " cd /app/src && 
+              celery -A mycelery worker -l INFO --uid=nobody --gid=nogroup"
+    env_file:
+      - .env
+    # restart: always
+    depends_on:
+      - celery_redis
+      - selenium-driver
+    # volumes:
+    #   - './src:/app/src'
+
+  selenium-driver:
+    image: selenium/standalone-firefox:latest
+    ports:
+      - "4444:4444"
+
+volumes:
+  mongo_data:

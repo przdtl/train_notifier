@@ -33,6 +33,8 @@ class TuTuTrainsListXPath(BaseModel):
 
     CHOOSE_SEATS_BUTTON: str = 'div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/button'
 
+    TRAIN_BUY_SECTION: str = 'div/div/div/div[2]/div/div[2]/div'
+
 
 class TuTuTrainXPath(BaseModel):
     HEADER: str = '//*[@id="root"]/div/div[4]/h1'
@@ -58,52 +60,81 @@ class TuturuConf(BaseModel):
     XPATH: TuTuXPath = TuTuXPath()
 
 
-class TelegramConf(BaseModel):
-    TOKEN: str = '6970223691:AAHYs7I01mWQWJqpHq6ioHw3-6FuaajjEz0'
+class TelegramConf(BaseSettings):
+    TOKEN: str
 
     WEB_SERVER_HOST: str = '127.0.0.1'
     WEB_SERVER_PORT: int = 8080
 
     WEBHOOK_PATH: str = "/webhook"
-    BASE_WEBHOOK_URL: str = 'https://b68d-176-208-33-29.ngrok-free.app'
+    BASE_WEBHOOK_URL: str
+
+    model_config = SettingsConfigDict(
+        env_prefix='TRAIN_PARSER_TELEGRAM_CONF_'
+    )
 
 
-class MongoDBConf(BaseModel):
-    DB_URL: str
+class MongoDBConf(BaseSettings):
+    DB_HOST: str
+    DB_USER: str
+    DB_PASS: str
     DB_NAME: str = 'stations'
     ROUTE_COLLECTION_NAME: str = 'routes'
     TRAINS_COLLECTION_NAME: str = 'trains'
     STATIONS_COLLECTION_NAME: str = 'stations'
 
+    @property
+    def DB_URL(cls) -> str:
+        return 'mongodb://{username}:{password}@{host}/{defaultauthdb}'.format(
+            username=cls.DB_HOST,
+            password=cls.DB_PASS,
+            host=cls.DB_HOST,
+            defaultauthdb=cls.DB_NAME,
+        )
 
-class CeleryConf(BaseModel):
+    model_config = SettingsConfigDict(
+        env_prefix='TRAIN_PARSER_MONGODB_CONF_'
+    )
+
+
+class CeleryConf(BaseSettings):
     BROKER_URL: str
     BACKEND_URL: str
 
+    model_config = SettingsConfigDict(
+        env_prefix='TRAIN_PARSER_CELERY_CONF_'
+    )
 
-class SeleniumConf(BaseModel):
-    PAGE_LOAD_DELAY: int = 3
+
+class SeleniumConf(BaseSettings):
+    PAGE_LOAD_DELAY: int = 5
+    REMOTE_URL: str = ''
+
+    model_config = SettingsConfigDict(
+        env_prefix='TRAIN_PARSER_SELENIUM_CONF_'
+    )
 
 
 class Settings(BaseSettings):
     # bot conf
-    TELEGRAM_CONF: TelegramConf = TelegramConf()
+    TELEGRAM_CONF: TelegramConf = TelegramConf()  # type: ignore
 
     # actual url of parsing site
     TUTURU_URL: TuturuConf = TuturuConf()
 
     # celery conf
-    # CELERY_CONF: CeleryConf = CeleryConf()
+    CELERY_CONF: CeleryConf = CeleryConf()
 
     # mongodb conf
-    # MONGODB_CONF: MongoDBConf = MongoDBConf()
+    MONGODB_CONF: MongoDBConf = MongoDBConf()
 
     # selenium conf
-    # SELENIUM_CONF: SeleniumConf = SeleniumConf()
+    SELENIUM_CONF: SeleniumConf = SeleniumConf()
 
     model_config = SettingsConfigDict(
         env_file='.env',
         env_prefix='TRAIN_PARSER_',
+        arbitrary_types_allowed=True
     )
 
 

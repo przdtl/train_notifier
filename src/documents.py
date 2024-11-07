@@ -1,7 +1,5 @@
-import datetime
-
 from typing import TypedDict
-from pydantic import PositiveInt, BaseModel
+from pydantic import PositiveInt
 
 
 class Station(TypedDict):

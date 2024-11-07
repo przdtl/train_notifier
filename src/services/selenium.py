@@ -15,6 +15,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 
 from config import settings
+from exceptions import NoTicketsTrain
 
 
 class Station(BaseModel):
@@ -25,12 +26,15 @@ class Station(BaseModel):
     time: str
 
 
-class TrainInfo(BaseModel):
+class ShortTrainInfo(BaseModel):
     train_number: str
-    train_page_url: HttpUrl
     trip_time: str
     departure_station: Station
     arrival_station: Station
+
+
+class TrainInfo(ShortTrainInfo):
+    train_page_url: HttpUrl
 
 
 class Ticket(BaseModel):
@@ -45,15 +49,22 @@ class Carriage(BaseModel):
     tickets: list[Ticket]
 
 
+class TrainsAnswer(BaseModel):
+    trains_list: list[TrainInfo]
+    wait_list: list[ShortTrainInfo]
+
+
 class TutuParser:
     def __init__(self) -> None:
-        options = Options()
-        options.add_argument('--headless')
-        self.__driver = webdriver.Firefox(options=options)
-
-    @property
-    def driver(self) -> WebDriver:
-        return self.__driver
+        self.options = Options()
+        self.options.add_argument('--headless')
+        if settings.SELENIUM_CONF.REMOTE_URL:
+            self.__driver = webdriver.Remote(
+                settings.SELENIUM_CONF.REMOTE_URL,
+                options=self.options
+            )
+        else:
+            self.__driver = webdriver.Firefox(options=self.options)
 
     def _open_page(self, url: HttpUrl) -> None:
         self.__driver.get(str(url))
@@ -64,11 +75,15 @@ class TutuParser:
     def _close_tab(self) -> None:
         self.__driver.close()
 
+    def _reload_driver(self) -> None:
+        self._close_browser()
+        self.__driver = webdriver.Firefox(options=self.options)
+
     def get_trains_list_by_titles(self,
                                   departure_st: str,
                                   arrival_st: str,
                                   date: datetime.date
-                                  ) -> list[TrainInfo]:
+                                  ) -> TrainsAnswer:
         self._open_page(AnyUrl(settings.TUTURU_URL.SEARCH_ROUTES_URL))
 
         departure_station_input = self.__driver.find_element(
@@ -80,23 +95,24 @@ class TutuParser:
 
         departure_station_input.send_keys(departure_st)
         try:
-            departure_hinting_element = WebDriverWait(self.__driver, 2).until(
+            departure_hinting_element = WebDriverWait(self.__driver, settings.SELENIUM_CONF.PAGE_LOAD_DELAY).until(
                 EC.presence_of_element_located(
                     (By.XPATH, settings.TUTURU_URL.XPATH.ROUTES_PAGE.FIRST_DEPARTURE_CITY_HINTING))
             )
         except TimeoutException:
-            return []
+            return TrainsAnswer(trains_list=[], wait_list=[])
 
         departure_hinting_element.click()
 
         arrival_station_input.send_keys(arrival_st)
         try:
-            arrival_hinting_element = WebDriverWait(self.__driver, 2).until(
+            arrival_hinting_element = WebDriverWait(self.__driver, settings.SELENIUM_CONF.PAGE_LOAD_DELAY).until(
                 EC.presence_of_element_located(
                     (By.XPATH, settings.TUTURU_URL.XPATH.ROUTES_PAGE.FIRST_ARRIVAL_CITY_HINTING))
             )
         except TimeoutException:
-            return []
+            return TrainsAnswer(trains_list=[], wait_list=[])
+
         arrival_hinting_element.click()
 
         date_input.send_keys(date.strftime('%d.%m.%Y'))
@@ -111,7 +127,7 @@ class TutuParser:
                                 nnst1: int,
                                 nnst2: int,
                                 date: datetime.date
-                                ) -> list[TrainInfo]:
+                                ) -> TrainsAnswer:
         url = AnyUrl(settings.TUTURU_URL.SEARCH_TRAINS_URL.format(
             nnst1=nnst1, nnst2=nnst2, date=date.strftime('%d.%m.%Y')
         ))
@@ -119,31 +135,38 @@ class TutuParser:
 
         return self._parse_trains_list()
 
-    def _parse_trains_list(self) -> list[TrainInfo]:
+    def _parse_trains_list(self) -> TrainsAnswer:
         try:
-            WebDriverWait(self.__driver, 5).until(
+            WebDriverWait(self.__driver, settings.SELENIUM_CONF.PAGE_LOAD_DELAY).until(
                 EC.presence_of_element_located(
                     (By.XPATH, settings.TUTURU_URL.XPATH.TRAINS_LIST_PAGE.HEADER))
             )
         except TimeoutException:
-            return []
+            return TrainsAnswer(trains_list=[], wait_list=[])
 
         trains_info_list: list[TrainInfo] = []
+        wait_list: list[ShortTrainInfo] = []
         trains_list = self.__driver.find_elements(
             By.XPATH, settings.TUTURU_URL.XPATH.TRAINS_LIST_PAGE.TRAINS_LIST)
         for train in trains_list:
-            try:
-                train_info = self._parse_train(train)
-            except TimeoutException:
+            for _ in range(5):
+                try:
+                    train_info = self._parse_train(train)
+                except TimeoutException:
+                    pass
+                else:
+                    break
+            else:
                 continue
 
-            trains_info_list.append(train_info)
+            if type(train_info) == TrainInfo:
+                trains_info_list.append(train_info)
+            else:
+                wait_list.append(train_info)
 
-        # self._close_browser()
+        return TrainsAnswer(trains_list=trains_info_list, wait_list=wait_list)
 
-        return trains_info_list
-
-    def _parse_train(self, train: WebElement) -> TrainInfo:
+    def _parse_train(self, train: WebElement) -> ShortTrainInfo:
         parsed_url = urlparse(self.__driver.current_url)
         nnst1 = int(parse_qs(parsed_url.query)['nnst1'][0])
         nnst2 = int(parse_qs(parsed_url.query)['nnst2'][0])
@@ -168,6 +191,10 @@ class TutuParser:
             'departure_station': departure_station,
             'arrival_station': arrival_station,
         }
+        buy_segments = train.find_elements(By.XPATH, settings.TUTURU_URL.XPATH.TRAINS_LIST_PAGE.TRAIN_BUY_SECTION)
+        if len(buy_segments) > 2:
+            return ShortTrainInfo(**train_info)
+
         choose_seats_button = train.find_element(
             By.XPATH, settings.TUTURU_URL.XPATH.TRAINS_LIST_PAGE.CHOOSE_SEATS_BUTTON)
         self.__driver.execute_script(
@@ -179,7 +206,7 @@ class TutuParser:
                 self.__driver.switch_to.window(window_handle)
                 break
 
-        WebDriverWait(self.__driver, 5).until(
+        WebDriverWait(self.__driver, settings.SELENIUM_CONF.PAGE_LOAD_DELAY).until(
             EC.presence_of_element_located(
                 (By.XPATH, settings.TUTURU_URL.XPATH.TRAIN_PAGE.HEADER))
         )
@@ -195,12 +222,12 @@ class TutuParser:
     def get_tickets_list(self, url: HttpUrl) -> list[Carriage]:
         self._open_page(url)
         try:
-            WebDriverWait(self.__driver, 5).until(
+            WebDriverWait(self.__driver, settings.SELENIUM_CONF.PAGE_LOAD_DELAY).until(
                 EC.presence_of_element_located(
-                    (By.XPATH, settings.TUTURU_URL.XPATH.TRAIN_PAGE.HEADER))
-            )
+                    (By.XPATH, settings.TUTURU_URL.XPATH.TRAIN_PAGE.HEADER)
+                ))
         except TimeoutException:
-            return []
+            raise NoTicketsTrain
 
         category_list = self.__driver.find_elements(
             By.XPATH, settings.TUTURU_URL.XPATH.TRAIN_PAGE.CATEGORY_LIST

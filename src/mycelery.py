@@ -1,9 +1,10 @@
-# from celery import Celery
+from celery import Celery
 
-# from config import settings
+from config import settings
 
-# app = Celery(
-#     __name__,
-#     broker=settings.CELERY_CONF.BROKER_URL,
-#     backend=settings.CELERY_CONF.BACKEND_URL,
-# )
+app = Celery(
+    'train_notifier',
+    broker=settings.CELERY_CONF.BROKER_URL,
+    backend=settings.CELERY_CONF.BACKEND_URL,
+    include=['tasks.selenium']
+)

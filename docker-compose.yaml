@@ -2,7 +2,7 @@ services:
   app:
     build: .
     container_name: TrainNotifierApp
-    command: 'python ./src/main.py'
+    command: 'python ./main.py'
     env_file:
       - .env
     ports:
@@ -30,22 +30,17 @@ services:
 
   celery_worker:
     build: .
-    command: > 
-      sh -c " cd /app/src && 
-              celery -A mycelery worker -l INFO --uid=nobody --gid=nogroup"
+    command: "celery -A mycelery worker -l INFO --uid=nobody --gid=nogroup"
     env_file:
       - .env
-    # restart: always
     depends_on:
       - celery_redis
       - selenium-driver
-    # volumes:
-    #   - './src:/app/src'
 
   selenium-driver:
     image: selenium/standalone-firefox:latest
-    ports:
-      - "4444:4444"
+    expose:
+      - 4444
 
 volumes:
   mongo_data:

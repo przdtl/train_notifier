@@ -1,5 +1,5 @@
 #!/bin/sh
 
-cd /app
+cd /app/src
 
 exec "$@"

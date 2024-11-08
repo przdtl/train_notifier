@@ -8,7 +8,7 @@ from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_applicati
 
 from loader import bot, dp
 from config import settings
-from routers import commands_router
+from common.routers import router as common_router
 
 
 async def on_startup(bot: Bot) -> None:
@@ -47,7 +47,7 @@ async def polling_bot_run() -> None:
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    dp.include_router(commands_router)
+    dp.include_router(common_router)
 
     webhook_bot_run()
 

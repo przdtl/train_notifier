@@ -2,7 +2,7 @@ from pydantic import AnyUrl
 
 from mycelery import app
 
-from services.selenium import TutuParser
+from common.services.selenium import TutuParser
 
 
 @app.task

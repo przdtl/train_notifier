@@ -2,7 +2,7 @@ FROM python:3.12-alpine AS builder
 
 WORKDIR /app
 
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app/src
 
 COPY ./requirements.txt .
 

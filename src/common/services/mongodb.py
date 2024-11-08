@@ -4,7 +4,7 @@ from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorCollection
 
 from mongodb import trains_collection
-from documents import Station
+from trains.documents import Station
 
 
 class TrainService:

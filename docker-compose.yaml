@@ -1,0 +1,43 @@
+services:
+  app:
+    build: .
+    container_name: TrainNotifierApp
+    command: ../shell_scripts/start_python_app.sh
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+      - celery_redis
+
+  mongo:
+    image: mongo:8.0.3
+    container_name: TrainNotifierMongoDB
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: 11111
+    volumes:
+      - mongo_data:/data/db
+    expose:
+      - 27017
+    restart: always
+
+  celery_redis:
+    image: redis:alpine
+    container_name: TrainNotifierCeleryRedis
+    expose:
+      - 6379
+    restart: always
+
+  celery_worker:
+    build: .
+    container_name: TrainNotifierCeleryWorker
+    command: ../shell_scripts/start_celery_worker.sh
+    env_file:
+      - .env
+    depends_on:
+      - celery_redis
+
+volumes:
+  mongo_data:

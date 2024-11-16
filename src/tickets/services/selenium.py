@@ -23,7 +23,7 @@ class Carriage(BaseModel):
     tickets: list[Ticket]
 
 
-class TocketsTutuParser(TutuParser):
+class TicketsTutuParser(TutuParser):
     def get_tickets_list(self, url: HttpUrl) -> list[Carriage]:
         self._open_page(url)
         try:

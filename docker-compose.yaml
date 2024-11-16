@@ -30,7 +30,16 @@ services:
 
   celery_worker:
     build: .
-    command: "celery -A mycelery worker -l INFO --uid=nobody --gid=nogroup"
+    command: "celery -A mycelery worker -l INFO"
+    env_file:
+      - .env
+    depends_on:
+      - celery_redis
+      - selenium-driver
+
+  celery_beat:
+    build: .
+    command: "celery -A mycelery beat -l INFO"
     env_file:
       - .env
     depends_on:

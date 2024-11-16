@@ -8,7 +8,7 @@ class Station(TypedDict):
     city: str
 
 
-class Route(TypedDict):
+class Train(TypedDict):
     user_id: PositiveInt
     train_number: str
     trip_time: str

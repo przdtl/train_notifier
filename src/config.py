@@ -76,21 +76,11 @@ class TelegramConf(BaseSettings):
 
 class MongoDBConf(BaseSettings):
     DB_HOST: str
+    DB_PORT: int
     DB_USER: str
     DB_PASS: str
     DB_NAME: str = 'stations'
-    ROUTE_COLLECTION_NAME: str = 'routes'
     TRAINS_COLLECTION_NAME: str = 'trains'
-    STATIONS_COLLECTION_NAME: str = 'stations'
-
-    @property
-    def DB_URL(cls) -> str:
-        return 'mongodb://{username}:{password}@{host}/{defaultauthdb}'.format(
-            username=cls.DB_HOST,
-            password=cls.DB_PASS,
-            host=cls.DB_HOST,
-            defaultauthdb=cls.DB_NAME,
-        )
 
     model_config = SettingsConfigDict(
         env_prefix='TRAIN_PARSER_MONGODB_CONF_'

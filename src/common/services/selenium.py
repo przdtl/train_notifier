@@ -1,9 +1,14 @@
+from typing import TypeVar, Type, Generic
+
 from pydantic import HttpUrl
 
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 
 from config import settings
+
+
+T = TypeVar('T', bound='TutuParser')
 
 
 class TutuParser:
@@ -32,17 +37,17 @@ class TutuParser:
         self.__driver = webdriver.Firefox(options=self.options)
 
 
-class TutuParserConnection:
-    def __init__(self) -> None:
+class TutuParserConnection(Generic[T]):
+    def __init__(self, tutu_parser: Type[T]) -> None:
         options = Options()
         options.add_argument('--headless')
 
-        self.parser = TutuParser(
+        self.parser = tutu_parser(
             options=options,
             remote_url=settings.SELENIUM_CONF.REMOTE_URL,
         )
 
-    def __enter__(self) -> TutuParser:
+    def __enter__(self) -> T:
         return self.parser
 
     def __exit__(self, *args, **kwargs) -> None:

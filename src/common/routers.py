@@ -1,8 +1,9 @@
 from aiogram import Router
 from aiogram.types import Message
 from aiogram.utils.markdown import hbold
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 
+from schedule.services.celery import schedule_periodic_task
 
 router = Router()
 
@@ -10,6 +11,12 @@ router = Router()
 @router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     await message.answer(f"Hello, {hbold(message.from_user.full_name)}!")
+
+
+@router.message(Command('run'))
+async def run_handler(message: Message) -> None:
+    schedule_periodic_task(message.from_user.id)
+    await message.answer('ok')
 
 
 @router.message()

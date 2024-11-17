@@ -36,3 +36,15 @@ class AbstractTicketsParser(BaseRailwayTicketServiceParser, metaclass=ABCMeta):
     @abstractmethod
     def parse(self):
         ...
+
+
+class BaseRailwayTicketService:
+    pass
+
+
+class TutuService(BaseRailwayTicketService):
+    pass
+
+
+class RZDService(BaseRailwayTicketService):
+    pass

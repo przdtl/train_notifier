@@ -29,6 +29,7 @@ WORKDIR /app
 
 COPY src/ ./src/
 COPY shell_scripts/ ./shell_scripts/
+COPY alembic.ini .
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app/src

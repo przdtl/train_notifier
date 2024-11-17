@@ -3,25 +3,32 @@ services:
     build: .
     container_name: TrainNotifierApp
     command: ../shell_scripts/start_python_app.sh
+    volumes:
+      - ./src/migrations/versions:/app/src/migrations/versions
     env_file:
       - .env
     ports:
       - "8080:8080"
     depends_on:
-      - mongo
+      - db
       - celery_redis
 
-  mongo:
-    image: mongo:8.0.3
-    container_name: TrainNotifierMongoDB
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: 11111
+  db:
+    image: postgres:17-alpine
+    container_name: TrainNotifierPostgreSQL
     volumes:
-      - mongo_data:/data/db
+      - postgres_data:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d train_notifier -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=11111
+      - POSTGRES_DB=train_notifier
     expose:
-      - 27017
-    restart: always
+      - 5432
 
   celery_redis:
     image: redis:alpine
@@ -40,4 +47,4 @@ services:
       - celery_redis
 
 volumes:
-  mongo_data:
+  postgres_data:

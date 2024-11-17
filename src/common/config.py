@@ -1,5 +1,3 @@
-import enum
-
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -25,20 +23,25 @@ class TelegramConf(BaseSettings):
     )
 
 
-class MongoDBConf(BaseSettings):
+class DatabaseConf(BaseSettings):
     DB_HOST: str
     DB_PORT: int
     DB_USER: str
     DB_PASS: str
     DB_NAME: str = 'train_notifier'
 
-    class Collections(str, enum.Enum):
-        TRAINS = 'trains'
-        TICKETS = 'tickets'
-        WAITINGS = 'waitings'
+    @property
+    def CONNECTION_URL(self):
+        return "postgresql+asyncpg://{username}:{password}@{host}:{port}/{db_name}".format(
+            username=self.DB_USER,
+            password=self.DB_PASS,
+            host=self.DB_HOST,
+            port=self.DB_PORT,
+            db_name=self.DB_NAME,
+        )
 
     model_config = SettingsConfigDict(
-        env_prefix='TRAIN_NOTIFIER__MONGODB_CONF__'
+        env_prefix='TRAIN_NOTIFIER__DB_CONF__'
     )
 
 
@@ -59,10 +62,9 @@ class Settings(BaseSettings):
     CELERY_CONF: CeleryConf = CeleryConf()  # type: ignore
 
     # Mongodb conf
-    MONGODB_CONF: MongoDBConf = MongoDBConf()  # type: ignore
+    DB_CONF: DatabaseConf = DatabaseConf()  # type: ignore
 
     model_config = SettingsConfigDict(
-        env_file='.env',
         env_prefix='TRAIN_NOTIFIER__',
     )
 

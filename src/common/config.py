@@ -1,3 +1,5 @@
+import enum
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -30,6 +32,11 @@ class MongoDBConf(BaseSettings):
     DB_PASS: str
     DB_NAME: str = 'train_notifier'
 
+    class Collections(str, enum.Enum):
+        TRAINS = 'trains'
+        TICKETS = 'tickets'
+        WAITINGS = 'waitings'
+
     model_config = SettingsConfigDict(
         env_prefix='TRAIN_NOTIFIER__MONGODB_CONF__'
     )
@@ -57,7 +64,6 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file='.env',
         env_prefix='TRAIN_NOTIFIER__',
-        # arbitrary_types_allowed=True
     )
 
 

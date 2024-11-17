@@ -6,26 +6,24 @@ from aiohttp import web
 from aiogram import Bot
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
-from utils.loader import bot, dp
-from utils.config import settings
-
-from utils.db import db
+from common.loader import bot, dp
+from common.config import settings
 
 
-async def on_startup(bot: Bot) -> None:
+async def dp_on_startup(bot: Bot) -> None:
     await bot.set_webhook('{}{}'.format(
         settings.TELEGRAM_CONF.WEBHOOK_CONF.BASE_WEBHOOK_URL,
         settings.TELEGRAM_CONF.WEBHOOK_CONF.WEBHOOK_PATH,
     ))
 
 
-async def on_shutdown(bot: Bot) -> None:
+async def dp_on_shutdown(bot: Bot) -> None:
     await bot.delete_webhook()
 
 
 def webhook_bot_run() -> None:
-    dp.startup.register(on_startup)
-    dp.shutdown.register(on_shutdown)
+    dp.startup.register(dp_on_startup)
+    dp.shutdown.register(dp_on_shutdown)
 
     app = web.Application()
 

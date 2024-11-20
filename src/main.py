@@ -8,34 +8,29 @@ from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_applicati
 
 from common.loader import bot, dp
 from common.config import settings
+from common.broker import broker
 
 
-async def dp_on_startup(bot: Bot) -> None:
+@dp.startup()
+async def setup_taskiq(bot: Bot, *_args, **_kwargs):
     await bot.set_webhook('{}{}'.format(
         settings.TELEGRAM_CONF.WEBHOOK_CONF.BASE_WEBHOOK_URL,
         settings.TELEGRAM_CONF.WEBHOOK_CONF.WEBHOOK_PATH,
     ))
+    if not broker.is_worker_process:
+        logging.info("Setting up taskiq")
+        await broker.startup()
 
 
-async def dp_on_shutdown(bot: Bot) -> None:
+@dp.shutdown()
+async def shutdown_taskiq(bot: Bot, *_args, **_kwargs):
     await bot.delete_webhook()
-
-
-async def fofofofoo():
-    from routes.tasks import taaask
-    taaask.delay()
-    taaask.delay()
-    taaask.delay()
-    taaask.delay()
-    taaask.delay()
-    taaask.delay()
-    taaask.delay()
+    if not broker.is_worker_process:
+        logging.info("Shutting down taskiq")
+        await broker.shutdown()
 
 
 def webhook_bot_run() -> None:
-    dp.startup.register(dp_on_startup)
-    dp.shutdown.register(dp_on_shutdown)
-
     app = web.Application()
 
     webhook_requests_handler = SimpleRequestHandler(
@@ -46,9 +41,6 @@ def webhook_bot_run() -> None:
         app,
         path=settings.TELEGRAM_CONF.WEBHOOK_CONF.WEBHOOK_PATH,
     )
-
-    import asyncio
-    asyncio.run(fofofofoo())
 
     setup_application(app, dp, bot=bot)
     web.run_app(

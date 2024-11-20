@@ -10,8 +10,13 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
-      - celery_redis
+      taskiq_broker:
+        condition: service_healthy
+      taskiq_backend:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+
 
   db:
     image: postgres:17-alpine
@@ -30,23 +35,44 @@ services:
     expose:
       - 5432
 
-  celery_redis:
+  taskiq_backend:
     image: redis:alpine
-    container_name: TrainNotifierCeleryRedis
+    container_name: TrainNotifierTaskiqRedisBackend
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
     expose:
       - 6379
-    restart: always
+    volumes:
+      - redis_data:/data
 
-  celery_worker:
+  taskiq_broker:
+    image: rabbitmq:4
+    container_name: TrainNotifierTaskiqRabbitMQBroker
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    expose:
+      - 5672
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  taskiq_worker:
     build: .
-    container_name: TrainNotifierCeleryWorker
-    command: ../shell_scripts/start_celery_worker.sh
+    container_name: TrainNotifierTaskiqWorker
+    command: ../shell_scripts/start_taskiq_worker.sh
     env_file:
       - .env
     depends_on:
-      - celery_redis
-
+      taskiq_broker:
+        condition: service_healthy
+      taskiq_backend:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+        
 volumes:
   postgres_data:
+  rabbitmq_data:
+  redis_data:

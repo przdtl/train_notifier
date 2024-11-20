@@ -9,12 +9,15 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.12"
 pydantic-settings = "^2.6.1"
-celery = {extras = ["redis"], version = "^5.4.0"}
 aiogram = "^3.14.0"
 playwright = "^1.48.0"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.36"}
 asyncpg = "^0.30.0"
 alembic = "^1.14.0"
+taskiq = "^0.11.7"
+taskiq-aio-pika = "^0.4.1"
+taskiq-redis = "^1.0.2"
+taskiq-aiogram = "^0.3.1"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -45,12 +45,12 @@ class DatabaseConf(BaseSettings):
     )
 
 
-class CeleryConf(BaseSettings):
+class TaskiqConf(BaseSettings):
     BROKER_URL: str
     BACKEND_URL: str
 
     model_config = SettingsConfigDict(
-        env_prefix='TRAIN_NOTIFIER__CELERY_CONF__'
+        env_prefix='TRAIN_NOTIFIER__TASKIQ_CONF__'
     )
 
 
@@ -59,7 +59,7 @@ class Settings(BaseSettings):
     TELEGRAM_CONF: TelegramConf = TelegramConf()  # type: ignore
 
     # Celery conf
-    CELERY_CONF: CeleryConf = CeleryConf()  # type: ignore
+    TASKIQ_CONF: TaskiqConf = TaskiqConf()  # type: ignore
 
     # Mongodb conf
     DB_CONF: DatabaseConf = DatabaseConf()  # type: ignore

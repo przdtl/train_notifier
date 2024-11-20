@@ -21,6 +21,17 @@ async def dp_on_shutdown(bot: Bot) -> None:
     await bot.delete_webhook()
 
 
+async def fofofofoo():
+    from routes.tasks import taaask
+    taaask.delay()
+    taaask.delay()
+    taaask.delay()
+    taaask.delay()
+    taaask.delay()
+    taaask.delay()
+    taaask.delay()
+
+
 def webhook_bot_run() -> None:
     dp.startup.register(dp_on_startup)
     dp.shutdown.register(dp_on_shutdown)
@@ -35,6 +46,10 @@ def webhook_bot_run() -> None:
         app,
         path=settings.TELEGRAM_CONF.WEBHOOK_CONF.WEBHOOK_PATH,
     )
+
+    import asyncio
+    asyncio.run(fofofofoo())
+
     setup_application(app, dp, bot=bot)
     web.run_app(
         app=app,

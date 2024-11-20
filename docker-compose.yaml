@@ -33,6 +33,8 @@ services:
   celery_redis:
     image: redis:alpine
     container_name: TrainNotifierCeleryRedis
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
     expose:
       - 6379
     restart: always

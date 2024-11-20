@@ -1,18 +1,25 @@
+import asyncio
+
 from celery.signals import worker_shutting_down, worker_init
 
-from common.utils import run_async
+
+async def async_worker_init() -> None:
+    from common.services.playwright import BaseRailwayTicketServiceParser
+    BaseRailwayTicketServiceParser()
+
+
+async def async_worker_shutting_down() -> None:
+    from common.services.playwright import BaseRailwayTicketServiceParser
+
+    parser = BaseRailwayTicketServiceParser()
+    asyncio.run(parser.stop_playwright_browser())
 
 
 @worker_init.connect
 def worker_on_init(*args, **kwargs) -> None:
-    from common.services.playwright import BaseRailwayTicketServiceParser
-
-    BaseRailwayTicketServiceParser()
+    asyncio.run(async_worker_init())
 
 
 @worker_shutting_down.connect
 def worker_on_shutdown(*args, **kwargs) -> None:
-    from common.services.playwright import BaseRailwayTicketServiceParser
-
-    parser = BaseRailwayTicketServiceParser()
-    run_async(parser.stop_playwright_browser)
+    asyncio.run(async_worker_shutting_down())

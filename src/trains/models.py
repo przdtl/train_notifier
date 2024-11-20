@@ -1,18 +1,10 @@
-import enum
 import datetime
 
 from sqlalchemy import Column, ForeignKey, String, DateTime, Time, Enum, Integer
 
 from common.db import Base
 
-
-class TrainStatus(str, enum.Enum):
-    '''
-    Статус наличия билетов на поезд
-    '''
-
-    WAITING = 'waiting'
-    AVAILABLE = "available"
+from trains.types import TrainStatus
 
 
 class Train(Base):
@@ -28,7 +20,7 @@ class Train(Base):
     trip_time = Column(Time, nullable=False)
     departure_datetime = Column(DateTime, nullable=False)
     arrival_datetime = Column(DateTime, nullable=False)
-    url = Column(String, nullable=False)
+    url = Column(String, nullable=True)
     route_id = Column(ForeignKey('route.id', ondelete='CASCADE'), nullable=False)
     status = Column(Enum(TrainStatus), nullable=False)
 

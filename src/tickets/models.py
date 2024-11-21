@@ -1,5 +1,3 @@
-import enum
-
 from sqlalchemy import Column, ForeignKey, String, Enum, Integer
 
 from common.db import Base

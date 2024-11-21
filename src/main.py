@@ -3,31 +3,12 @@ import logging
 
 from aiohttp import web
 
-from aiogram import Bot
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
 from common.loader import bot, dp
 from common.config import settings
-from common.broker import broker
 
-
-@dp.startup()
-async def setup_taskiq(bot: Bot, *_args, **_kwargs):
-    await bot.set_webhook('{}{}'.format(
-        settings.TELEGRAM_CONF.WEBHOOK_CONF.BASE_WEBHOOK_URL,
-        settings.TELEGRAM_CONF.WEBHOOK_CONF.WEBHOOK_PATH,
-    ))
-    if not broker.is_worker_process:
-        logging.info("Setting up taskiq")
-        await broker.startup()
-
-
-@dp.shutdown()
-async def shutdown_taskiq(bot: Bot, *_args, **_kwargs):
-    await bot.delete_webhook()
-    if not broker.is_worker_process:
-        logging.info("Shutting down taskiq")
-        await broker.shutdown()
+import bootstrap
 
 
 def webhook_bot_run() -> None:

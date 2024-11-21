@@ -1,6 +1,6 @@
 # Celery confingiration
-TRAIN_NOTIFIER__CELERY_CONF__BROKER_URL = 'redis://celery_redis:6379/0'
-TRAIN_NOTIFIER__CELERY_CONF__BACKEND_URL = 'redis://celery_redis:6379/0'
+TRAIN_NOTIFIER__TASKIQ_CONF__BROKER_URL = 'amqp://guest:guest@taskiq_broker:5672/'
+TRAIN_NOTIFIER__TASKIQ_CONF__BACKEND_URL = 'redis://taskiq_backend:6379/0'
 CELERY_WORKERS_COUNT = 4
 
 # DB configuration

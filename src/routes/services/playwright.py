@@ -1,10 +1,14 @@
+import asyncio
 import datetime
 
 from abc import abstractmethod, ABCMeta
 
+from playwright.async_api import TimeoutError
+
+from common.config import settings
 from common.services.playwright import BaseRailwayTicketServiceParser
 
-from routes.exceptions import RouteSearchURLNotSetError
+from routes.exceptions import RouteSearchURLNotSetError, RouteNotFoundError
 
 
 class AbstractRoutesParser(BaseRailwayTicketServiceParser, metaclass=ABCMeta):
@@ -66,49 +70,45 @@ class AbstractRoutesParser(BaseRailwayTicketServiceParser, metaclass=ABCMeta):
 
 
 class TutuTicketsParser(AbstractRoutesParser):
-    route_search_url = 'https://www.tutu.ru/poezda/'
+    route_search_url = settings.TICKET_SERVICES.TUTU_CONF.SEARCH_ROUTES_URL
 
     async def _input_departure_station(self, departure_st: str) -> None:
         departure_st_input = self._page.locator('xpath={}'.format(
-            '//*[@id="wrapper"]/div[3]/div/form/div/div/div[1]/div/div[1]/div[1]/input'
+            settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.DEPARTURE_ST_INPUT
         ))
         await departure_st_input.fill(departure_st)
 
     async def _input_arrival_station(self, arrival_st: str) -> None:
         arrival_st_input = self._page.locator('xpath={}'.format(
-            '//*[@id="wrapper"]/div[3]/div/form/div/div/div[3]/div/div[1]/div[1]/input'
+            settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.ARRIVAL_ST_INPUT
         ))
         await arrival_st_input.fill(arrival_st)
 
     async def _input_departure_date(self, date: datetime.date) -> None:
         date_input = self._page.locator('xpath={}'.format(
-            '//*[@id="wrapper"]/div[3]/div/form/div/div/div[4]/div/div[1]/div/input'
+            settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.DATE_INPUT
         ))
         await date_input.fill(date.strftime('%d.%m.%Y'))
 
     async def _click_to_find_route_button(self) -> None:
         find_button = self._page.locator('xpath={}'.format(
-            '//*[@id="wrapper"]/div[3]/div/form/div/div/div[6]/button'
+            settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.SHOW_SCHEDULE_BUTTON
         ))
         await find_button.click()
 
     async def _get_route_url(self) -> str:
-        import asyncio
-        await asyncio.sleep(10)
+        await asyncio.sleep(1)
 
-        await self._page.screenshot(path='screenshot.png')
-
-        return self._page.url
-
-    async def parse(self, departure_st: str, arrival_st: str, date: datetime.date) -> str:
-        station_callout_page = await super().parse(departure_st, arrival_st, date)
-
-        if 'https://www.tutu.ru/poezda/rasp_d.php' in station_callout_page:
+        station_callout_page = self._page.url
+        if settings.TICKET_SERVICES.TUTU_CONF.TRAINS_LIST_PAGE_BASE_URL in station_callout_page:
             return station_callout_page
 
         show_route_button = self._page.locator('xpath={}'.format(
-            '//*[@id="wrapper"]/div[3]/div[4]/div/div[4]/div/div/div/div/div[1]/button'
+            settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.SHOW_ROUTE_BUTTON
         ))
-        await show_route_button.click()
+        try:
+            await show_route_button.click(timeout=40000)
+        except TimeoutError:
+            raise RouteNotFoundError
 
         return self._page.url

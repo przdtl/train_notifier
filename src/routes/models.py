@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String, DateTime, Integer
+from sqlalchemy import Column, ForeignKey, String, Integer, Date
 
 from common.db import Base
 
@@ -14,7 +14,7 @@ class Route(Base):
 
     _from = Column('from', String, nullable=False)
     to = Column(String, nullable=False)
-    date = Column(DateTime, nullable=False)
+    date = Column(Date, nullable=False)
     url = Column(String, nullable=False)
 
 

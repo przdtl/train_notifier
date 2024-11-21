@@ -6,11 +6,11 @@ RUN apt-get update && apt-get install -y \
 
 ENV POETRY_VERSION=1.8.4
 RUN curl -sSL https://install.python-poetry.org | python3 -
-    
-    ENV PATH="/root/.local/bin:$PATH" \
+
+ENV PATH="/root/.local/bin:$PATH" \
     POETRY_VIRTUALENVS_CREATE=false \
     POETRY_NO_INTERACTION=1
-    
+
 WORKDIR /app
 
 COPY pyproject.toml poetry.lock ./

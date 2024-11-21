@@ -1,3 +1,5 @@
+from pydantic import BaseModel
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -54,6 +56,70 @@ class TaskiqConf(BaseSettings):
     )
 
 
+class TuTuRoutesXPath(BaseModel):
+    DEPARTURE_ST_INPUT: str = '//*[@id="wrapper"]/div[3]/div/form/div/div/div[1]/div/div[1]/div[1]/input'
+    ARRIVAL_ST_INPUT: str = '//*[@id="wrapper"]/div[3]/div/form/div/div/div[3]/div/div[1]/div[1]/input'
+    DATE_INPUT: str = '//*[@id="wrapper"]/div[3]/div/form/div/div/div[4]/div/div[1]/div/input'
+
+    FIRST_DEPARTURE_CITY_HINTING: str = '//*[@id="wrapper"]/div[3]/div/form/div/div/div[1]/div/div[1]/div[2]/div[1]/ul/li[1]/div'
+    FIRST_ARRIVAL_CITY_HINTING: str = '//*[@id="wrapper"]/div[3]/div/form/div/div/div[3]/div/div[1]/div[2]/div[1]/ul/li[1]/div'
+
+    SHOW_SCHEDULE_BUTTON: str = '//*[@id="wrapper"]/div[3]/div/form/div/div/div[6]/button'
+
+    SHOW_ROUTE_BUTTON: str = '//*[@id="wrapper"]/div[3]/div[4]/div/div[4]/div/div/div/div/div[1]/button'
+
+
+class TuTuTrainsListXPath(BaseModel):
+    HEADER: str = '//*[@id="root"]/div/div[3]/div/div[2]/div[2]/div[3]/span[2]'
+
+    TRAINS_LIST: str = '//*[@id="root"]/div/div[3]/div/div[3]/div'
+
+    DEPARTURE_TIME: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[1]/span[1]'
+    DEPARTURE_DATE: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[3]/div[1]/span[1]'
+    DEPARTURE_TITLE: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[3]/div[1]/span[2]'
+    DEPARTURE_CITY: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[3]/div[1]/span[3]'
+
+    ARRIVAL_TIME: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[1]/span[3]'
+    ARRIVAL_DATE: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[3]/div[2]/span[1]'
+    ARRIVAL_TITLE: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[3]/div[2]/span[2]'
+    ARRIVAL_CITY: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[3]/div[2]/span[3]'
+
+    TRAIN_NUMBER: str = 'div/div/div[2]/div[1]/div/div[1]/div[1]/div/div[1]/span/span'
+    TRAIN_TRIP_TIME: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[1]/span[2]'
+
+    CHOOSE_SEATS_BUTTON: str = 'div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/button'
+
+    TRAIN_BUY_SECTION: str = 'div/div/div/div[2]/div/div[2]/div'
+
+
+class TuTuTrainXPath(BaseModel):
+    HEADER: str = '//*[@id="root"]/div/div[4]/h1'
+
+    CATEGORY_LIST: str = '//*[@id="root"]/div/div[4]/div[5]/div'
+    CARRIAGE_NUMBER: str = 'div/div/div/div/div/div/div[1]/div[1]/div/div/span[1]'
+    OPEN_CARRIAGE_INFO_BUTTON: str = 'div/div/div/div/div/div/div[1]/div[4]/div/div/div/button'
+    CLOSE_CARRIAGE_INFO_BUTTON: str = 'div/div/div/div/div/div/div[1]/div[4]/div/div/button'
+    SEAT_ITEM: str = 'div/div/div/div/div/div/div[2]/div/div[4]/div/div/div/div/div/div'
+    CARRIAGE_PRICE: str = 'div/div/div/div/div/div/div[1]/div[3]/div/span'
+
+
+class TuTuXPath(BaseModel):
+    ROUTES_PAGE: TuTuRoutesXPath = TuTuRoutesXPath()
+    TRAINS_LIST_PAGE: TuTuTrainsListXPath = TuTuTrainsListXPath()
+    TRAIN_PAGE: TuTuTrainXPath = TuTuTrainXPath()
+
+
+class TutuConf(BaseModel):
+    SEARCH_ROUTES_URL: str = 'https://www.tutu.ru/poezda'
+    TRAINS_LIST_PAGE_BASE_URL: str = 'https://www.tutu.ru/poezda/rasp_d.php'
+
+    XPATH: TuTuXPath = TuTuXPath()
+
+
+class TicketServices(BaseModel):
+    TUTU_CONF: TutuConf = TutuConf()
+
+
 class Settings(BaseSettings):
     # Telegram bot conf
     TELEGRAM_CONF: TelegramConf = TelegramConf()  # type: ignore
@@ -63,6 +129,9 @@ class Settings(BaseSettings):
 
     # Mongodb conf
     DB_CONF: DatabaseConf = DatabaseConf()  # type: ignore
+
+    # Railway ticket services
+    TICKET_SERVICES: TicketServices = TicketServices()
 
     model_config = SettingsConfigDict(
         env_prefix='TRAIN_NOTIFIER__',

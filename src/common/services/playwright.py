@@ -18,7 +18,7 @@ class BaseRailwayTicketServiceParser:
     @classmethod
     async def _run_playwright_browser(cls) -> None:
         cls._playwright = await async_playwright().start() if not cls._playwright else cls._playwright
-        cls._browser = await cls._playwright.chromium.launch(headless=True, args=["--no-sandbox"]) if not cls._browser else cls._browser
+        cls._browser = await cls._playwright.chromium.launch(headless=True) if not cls._browser else cls._browser
 
     @classmethod
     async def stop_playwright_browser(cls) -> None:

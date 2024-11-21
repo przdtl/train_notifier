@@ -24,7 +24,7 @@ class AbstractRoutesParser(BaseRailwayTicketServiceParser, metaclass=ABCMeta):
             date (datetime.date): Дата отправления
 
         Returns:
-            HttpUrl: Ссылка на страницу данного маршрута
+            str: Ссылка на страницу данного маршрута
 
         Raises:
             RouteNotFoundError: Маршрут по входным данным не найден
@@ -69,7 +69,7 @@ class AbstractRoutesParser(BaseRailwayTicketServiceParser, metaclass=ABCMeta):
         """
 
 
-class TutuTicketsParser(AbstractRoutesParser):
+class TutuRoutesParser(AbstractRoutesParser):
     route_search_url = settings.TICKET_SERVICES.TUTU_CONF.SEARCH_ROUTES_URL
 
     async def _input_departure_station(self, departure_st: str) -> None:

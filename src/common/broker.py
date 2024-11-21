@@ -6,6 +6,7 @@ from taskiq_aio_pika import AioPikaBroker
 from common.config import settings
 from common.middlewares import StartShutdownMiddleware
 
+
 broker = AioPikaBroker(
     settings.TASKIQ_CONF.BROKER_URL
 ).with_result_backend(RedisAsyncResultBackend(

@@ -1,12 +1,10 @@
-import sys
-import logging
-
 from aiohttp import web
 
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
 from common.loader import bot, dp
 from common.config import settings
+from common.logging import setup_logging
 
 import bootstrap
 
@@ -32,8 +30,7 @@ def webhook_bot_run() -> None:
 
 
 def main() -> None:
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-
+    setup_logging()
     webhook_bot_run()
 
 

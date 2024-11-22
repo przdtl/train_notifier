@@ -1,6 +1,8 @@
-from sqlalchemy import Column, ForeignKey, String, Integer, Date
+from sqlalchemy import Column, ForeignKey, String, Integer, Date, Enum
 
 from common.db import Base
+
+from routes.types import RailwayTicketServices
 
 
 class Route(Base):
@@ -16,6 +18,7 @@ class Route(Base):
     to = Column(String, nullable=False)
     date = Column(Date, nullable=False)
     url = Column(String, nullable=False)
+    railway_ticket_service = Column(Enum(RailwayTicketServices), nullable=False)
 
 
 class UserRoutes(Base):

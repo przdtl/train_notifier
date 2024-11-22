@@ -1,6 +1,11 @@
+import enum
 import datetime
 
 from typing import TypedDict
+
+
+class RailwayTicketServices(str, enum.Enum):
+    TUTURU = 'TUTURU'
 
 
 class Route(TypedDict):
@@ -8,3 +13,4 @@ class Route(TypedDict):
     to: str
     date: datetime.date
     url: str
+    railway_ticket_service: RailwayTicketServices

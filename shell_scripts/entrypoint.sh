@@ -1,9 +1,5 @@
 #!/bin/sh
 
-cd /app
-
-alembic upgrade head
-
-cd ./src
+cd /app/src
 
 exec "$@"

@@ -8,11 +8,13 @@ from playwright.async_api import TimeoutError
 from common.config import settings
 from common.services.playwright import BaseRailwayTicketServiceParser
 
+from routes.types import RailwayTicketServices
 from routes.exceptions import RouteSearchURLNotSetError, RouteNotFoundError
 
 
 class AbstractRoutesParser(BaseRailwayTicketServiceParser, metaclass=ABCMeta):
-    route_search_url: str | None = None
+    service_name: RailwayTicketServices | None = None
+    service_route_search_url: str | None = None
 
     async def parse(self, departure_st: str, arrival_st: str, date: datetime.date) -> str:
         """
@@ -31,10 +33,10 @@ class AbstractRoutesParser(BaseRailwayTicketServiceParser, metaclass=ABCMeta):
             RouteSearchURLNotSetError: URL для поиска маршрута поезда для данного сайта не задан
 
         """
-        if self.route_search_url is None:
+        if self.service_route_search_url is None:
             raise RouteSearchURLNotSetError
 
-        await self._open_page(self.route_search_url)
+        await self._open_page(self.service_route_search_url)
         await self._input_departure_station(departure_st)
         await self._input_arrival_station(arrival_st)
         await self._input_departure_date(date)
@@ -70,6 +72,7 @@ class AbstractRoutesParser(BaseRailwayTicketServiceParser, metaclass=ABCMeta):
 
 
 class TutuRoutesParser(AbstractRoutesParser):
+    service_name = RailwayTicketServices.TUTURU
     route_search_url = settings.TICKET_SERVICES.TUTU_CONF.SEARCH_ROUTES_URL
 
     async def _input_departure_station(self, departure_st: str) -> None:

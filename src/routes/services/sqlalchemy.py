@@ -5,18 +5,20 @@ from sqlalchemy import select
 from common.db import async_session_maker
 
 from routes.models import Route
+from routes.types import RailwayTicketServices
 
 
-async def get_route_url(departure_st: str, arrival_st: str, date: datetime.date) -> str | None:
+async def get_route_url(departure_st: str, arrival_st: str, date: datetime.date, ticket_service: RailwayTicketServices) -> str | None:
     """
-    Получает URL маршрута из базы данных по данным отправления, прибытия и дате
+    Получает URL маршрута из базы данных по данным отправления, прибытия, дате и названию сервиса
 
     Args:
         departure_st (str): Станция отправления
         arrival_st (str): Станция прибытия
         date (str): Дата маршрута
+        ticket_service (RailwayTicketServices) Название сервиса продажи железнодорожных билетов
 
-    Returns: 
+    Returns:
         str: URL маршрута, хранящегося в БД
         None: Если данный маршрут отсутствует в БД
 
@@ -27,7 +29,8 @@ async def get_route_url(departure_st: str, arrival_st: str, date: datetime.date)
             .where(
                 Route._from == departure_st,
                 Route.to == arrival_st,
-                Route.date == date
+                Route.date == date,
+                Route.railway_ticket_service == ticket_service,
             )
         )
         result = await session.execute(query)
@@ -36,7 +39,7 @@ async def get_route_url(departure_st: str, arrival_st: str, date: datetime.date)
         return url
 
 
-async def add_route(departure_st: str, arrival_st: str, date: datetime.date, url: str) -> None:
+async def add_route(departure_st: str, arrival_st: str, date: datetime.date, url: str, ticket_service: RailwayTicketServices) -> None:
     """
     Добавляет новую запись о маршруте в базу данных
 
@@ -45,6 +48,7 @@ async def add_route(departure_st: str, arrival_st: str, date: datetime.date, url
         arrival_st (str): Станция прибытия
         date (str): Дата маршрута
         url (str): URL маршрута
+        ticket_service (RailwayTicketServices) Название сервиса продажи железнодорожных билетов
 
     """
     async with async_session_maker() as session:
@@ -52,7 +56,8 @@ async def add_route(departure_st: str, arrival_st: str, date: datetime.date, url
             _from=departure_st,
             to=arrival_st,
             date=date,
-            url=url
+            url=url,
+            railway_ticket_service=ticket_service,
         )
         session.add(new_route)
         await session.commit()

@@ -11,7 +11,7 @@ from routes.routers import router as routes_router
 import bootstrap
 
 dp.include_routers(
-    routes_router
+    routes_router,
 )
 
 

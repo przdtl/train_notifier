@@ -2,7 +2,7 @@ services:
   app:
     build: .
     container_name: TrainNotifierApp
-    command: ../shell_scripts/start_python_app.sh
+    command: ./shell_scripts/start_python_app.sh
     volumes:
       - ./src/migrations/versions:/app/src/migrations/versions
     env_file:
@@ -61,7 +61,7 @@ services:
   taskiq_worker:
     build: .
     container_name: TrainNotifierTaskiqWorker
-    command: ../shell_scripts/start_taskiq_worker.sh
+    command: ./shell_scripts/start_taskiq_worker.sh
     env_file:
       - .env
     depends_on:

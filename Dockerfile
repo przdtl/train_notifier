@@ -31,6 +31,8 @@ COPY src/ ./src/
 COPY shell_scripts/ ./shell_scripts/
 COPY alembic.ini .
 
+RUN chmod +x  -R ./shell_scripts 
+
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app/src
 

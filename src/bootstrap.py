@@ -14,8 +14,8 @@ import logging
 from aiogram import Bot
 
 from common.loader import dp
-from common.config import settings
 from common.broker import broker
+from common.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -31,10 +31,19 @@ async def shutdown_taskiq() -> None:
 
 
 async def setup_telegram_webhook(bot: Bot) -> None:
-    await bot.set_webhook('{}{}'.format(
+    webhook_url = '{}{}'.format(
         settings.TELEGRAM_CONF.WEBHOOK_CONF.BASE_WEBHOOK_URL,
         settings.TELEGRAM_CONF.WEBHOOK_CONF.WEBHOOK_PATH,
-    ))
+    )
+    is_webhook_set = await bot.set_webhook(webhook_url)
+    logging_message = (
+        'The webhook at "{}" has been successfully set'
+        if is_webhook_set else
+        'An error occurred during the installation of the Webhook with the address "{}"'
+    )
+    logger.info(
+        logging_message.format(webhook_url)
+    )
 
 
 async def shutdown_telegram_webhook(bot: Bot) -> None:

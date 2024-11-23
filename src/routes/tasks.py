@@ -1,8 +1,10 @@
+import asyncio
 import logging
 import datetime
 
 from common.broker import broker
 
+from routes.exceptions import RouteNotFoundError
 from routes.parser_factory import parser_factory
 from routes.types import Route, RailwayTicketServices
 from routes.services.sqlalchemy import get_route_url, add_route
@@ -11,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 @broker.task
-async def get_route_info(
+async def get_route_info_for_service(
         departure_st: str,
         arrival_st: str,
         date: datetime.date,
@@ -65,3 +67,40 @@ async def get_route_info(
         url=url,
         railway_ticket_service=ticket_service,
     )
+
+
+@broker.task
+async def get_route_info(
+        departure_st: str,
+        arrival_st: str,
+        date: datetime.date,
+) -> list[Route]:
+    """
+    Получает информацию о маршрутах между двумя станциями на заданную дату в поддерживаемых сервисах продажи ЖД билетов
+
+    Args:
+        departure_st (str): Название станции отправления
+        arrival_st (str): Название станции прибытия
+        date (datetime.date): Дата отправления
+
+    Returns:
+        list[Route]: Список, содержащий объекты маршрутов для поддерживаемых сервисов продажи билетов
+
+    """
+
+    routes: list[Route] = []
+
+    async def get_route_info_iteration(service_name: RailwayTicketServices) -> None:
+        task = await get_route_info_for_service.kiq(departure_st, arrival_st, date, service_name)
+        try:
+            res = await task.wait_result()
+            route = res.return_value
+        except RouteNotFoundError:
+            pass
+        else:
+            routes.append(route)
+
+    coros = [get_route_info_iteration(service_name) for service_name in parser_factory.parsers.keys()]
+    await asyncio.gather(*coros)
+
+    return routes

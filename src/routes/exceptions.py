@@ -15,3 +15,10 @@ class RouteSearchURLNotSetError(RouteError, PlaywrightError):
 
 class ServiceNameNotSetError(RouteError, PlaywrightError):
     """Исключение для случаев, когда название сервиса продажи билетов не установлено"""
+
+
+class NoSuchParserInFactoryError(RouteError, PlaywrightError):
+    """
+    Исключение для случаев, когда совершается попытка получить парсер по имени, 
+    который не был зарегистрирован в фабрике
+    """

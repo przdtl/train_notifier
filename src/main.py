@@ -6,7 +6,13 @@ from common.loader import bot, dp
 from common.config import settings
 from common.logging import setup_logging
 
+from routes.routers import router as routes_router
+
 import bootstrap
+
+dp.include_routers(
+    routes_router
+)
 
 
 def webhook_bot_run() -> None:

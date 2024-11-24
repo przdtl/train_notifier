@@ -7,11 +7,15 @@ from common.config import settings
 from common.logging import setup_logging
 
 from routes.routers import router as routes_router
+from trains.routers import router as trains_router
+from scheduler.routers import router as scheduler_router
 
 import bootstrap
 
 dp.include_routers(
     routes_router,
+    trains_router,
+    scheduler_router,
 )
 
 

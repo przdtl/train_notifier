@@ -3,12 +3,14 @@ import asyncio
 
 from playwright.async_api import async_playwright
 
+from common.types import RailwayTicketServices
 from common.exceptions import BrowserNotInitializedError
 
 logger = logging.getLogger(__name__)
 
 
 class BaseRailwayTicketServiceParser:
+    _service_name: RailwayTicketServices | None = None
     _playwright = None
     _browser = None
 

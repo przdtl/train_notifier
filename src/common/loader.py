@@ -9,6 +9,6 @@ dp = Dispatcher()
 bot = Bot(
     token=settings.TELEGRAM_CONF.TOKEN,
     default=DefaultBotProperties(
-        parse_mode=ParseMode.MARKDOWN_V2
+        parse_mode=ParseMode.HTML
     )
 )

@@ -3,9 +3,9 @@ import datetime
 from sqlalchemy import select
 
 from common.db import async_session_maker
+from common.types import RailwayTicketServices
 
 from routes.models import Route
-from routes.types import RailwayTicketServices
 
 
 async def get_route_url(departure_st: str, arrival_st: str, date: datetime.date, ticket_service: RailwayTicketServices) -> str | None:

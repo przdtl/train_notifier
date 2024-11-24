@@ -1,8 +1,7 @@
-from sqlalchemy import Column, ForeignKey, String, Integer, Date, Enum
+from sqlalchemy import Column, ForeignKey, String, Integer, Date, Enum, UniqueConstraint
 
 from common.db import Base
-
-from routes.types import RailwayTicketServices
+from common.types import RailwayTicketServices
 
 
 class Route(Base):
@@ -19,6 +18,10 @@ class Route(Base):
     date = Column(Date, nullable=False)
     url = Column(String, nullable=False)
     railway_ticket_service = Column(Enum(RailwayTicketServices), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("from", "to", "date", "railway_ticket_service", name="unique_route_for_every_service"),
+    )
 
 
 class UserRoutes(Base):

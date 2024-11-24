@@ -3,10 +3,11 @@ import logging
 import datetime
 
 from common.broker import broker
+from common.types import RailwayTicketServices
 
+from routes.types import Route
 from routes.exceptions import RouteNotFoundError
 from routes.parser_factory import parser_factory
-from routes.types import Route, RailwayTicketServices
 from routes.services.sqlalchemy import get_route_url, add_route
 
 logger = logging.getLogger(__name__)

@@ -70,26 +70,18 @@ class TuTuRoutesXPath(BaseModel):
 
 
 class TuTuTrainsListXPath(BaseModel):
-    HEADER: str = '//*[@id="root"]/div/div[3]/div/div[2]/div[2]/div[3]/span[2]'
-
     TRAINS_LIST: str = '//*[@id="root"]/div/div[3]/div/div[3]/div'
 
-    DEPARTURE_TIME: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[1]/span[1]'
-    DEPARTURE_DATE: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[3]/div[1]/span[1]'
-    DEPARTURE_TITLE: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[3]/div[1]/span[2]'
-    DEPARTURE_CITY: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[3]/div[1]/span[3]'
+    DEPARTURE_TIME: str = 'div[1]/div/div/div[1]/div/div[2]/div[1]/div[1]/span[1]'
+    DEPARTURE_DATE: str = 'div[1]/div/div/div[1]/div/div[2]/div[1]/div[3]/div[1]/span[1]'
 
-    ARRIVAL_TIME: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[1]/span[3]'
-    ARRIVAL_DATE: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[3]/div[2]/span[1]'
-    ARRIVAL_TITLE: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[3]/div[2]/span[2]'
-    ARRIVAL_CITY: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[3]/div[2]/span[3]'
+    ARRIVAL_TIME: str = 'div[1]/div/div/div[1]/div/div[2]/div[1]/div[1]/span[3]'
+    ARRIVAL_DATE: str = 'div[1]/div/div/div[1]/div/div[2]/div[1]/div[3]/div[2]/span[1]'
 
-    TRAIN_NUMBER: str = 'div/div/div[2]/div[1]/div/div[1]/div[1]/div/div[1]/span/span'
-    TRAIN_TRIP_TIME: str = 'div/div/div[2]/div[1]/div/div[2]/div[1]/div[1]/span[2]'
+    TRAIN_NUMBER: str = 'div/div/div/div[1]/div/div[1]/div[1]/div/div[1]/span/span'
+    TRAIN_TRIP_TIME: str = 'div[1]/div/div/div[1]/div/div[2]/div[1]/div[1]/span[2]'
 
-    CHOOSE_SEATS_BUTTON: str = 'div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/button'
-
-    TRAIN_BUY_SECTION: str = 'div/div/div/div[2]/div/div[2]/div'
+    CHOOSE_SEATS_BUTTON: str = 'div[1]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/button'
 
 
 class TuTuTrainXPath(BaseModel):

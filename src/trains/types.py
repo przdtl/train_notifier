@@ -15,7 +15,7 @@ class TrainStatus(str, enum.Enum):
 
 class Train(TypedDict):
     number: str
-    trip_time: datetime.time
+    trip_time: datetime.timedelta
     departure_datetime: datetime.datetime
     arrival_datetime: datetime.datetime
     url: str | None

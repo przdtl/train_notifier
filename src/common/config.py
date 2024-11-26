@@ -85,14 +85,10 @@ class TuTuTrainsListXPath(BaseModel):
 
 
 class TuTuTrainXPath(BaseModel):
-    HEADER: str = '//*[@id="root"]/div/div[4]/h1'
-
-    CATEGORY_LIST: str = '//*[@id="root"]/div/div[4]/div[5]/div'
-    CARRIAGE_NUMBER: str = 'div/div/div/div/div/div/div[1]/div[1]/div/div/span[1]'
+    CARRIAGE_NUMBER: str = 'div/div/div/div/div/div/div[1]/div[1]/div/span[1]'
     OPEN_CARRIAGE_INFO_BUTTON: str = 'div/div/div/div/div/div/div[1]/div[4]/div/div/div/button'
     CLOSE_CARRIAGE_INFO_BUTTON: str = 'div/div/div/div/div/div/div[1]/div[4]/div/div/button'
     SEAT_ITEM: str = 'div/div/div/div/div/div/div[2]/div/div[4]/div/div/div/div/div/div'
-    CARRIAGE_PRICE: str = 'div/div/div/div/div/div/div[1]/div[3]/div/span'
 
 
 class TuTuXPath(BaseModel):

@@ -1,12 +1,9 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import select, delete
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy import select
 
 from trains.types import Train as TrainType
 from trains.models import Train as TrainModel
 
 from common.db import async_session_maker
-from common.types import RailwayTicketServices
 
 
 async def synchronize_trains_info(route_id: int, trains: list[TrainType]) -> None:

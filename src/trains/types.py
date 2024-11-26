@@ -9,8 +9,8 @@ class TrainStatus(str, enum.Enum):
     Статус наличия билетов на поезд
     '''
 
-    WAITING = 'waiting'
-    AVAILABLE = "available"
+    WAITING = 'В списке ожидания'
+    AVAILABLE = "Доступны"
 
 
 class Train(TypedDict):

@@ -8,7 +8,5 @@ from common.config import settings
 dp = Dispatcher()
 bot = Bot(
     token=settings.TELEGRAM_CONF.TOKEN,
-    default=DefaultBotProperties(
-        parse_mode=ParseMode.HTML
-    )
+    default=DefaultBotProperties(parse_mode=ParseMode.HTML),
 )

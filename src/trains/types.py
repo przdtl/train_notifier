@@ -5,11 +5,11 @@ from typing import TypedDict
 
 
 class TrainStatus(str, enum.Enum):
-    '''
+    """
     Статус наличия билетов на поезд
-    '''
+    """
 
-    WAITING = 'В списке ожидания'
+    WAITING = "В списке ожидания"
     AVAILABLE = "Доступны"
 
 

@@ -12,16 +12,16 @@ from common.db import Base
 from common.config import settings
 
 # importing models to create migrations
-from trains.models import Train
-from tickets.models import Ticket
-from routes.models import Route
+from trains.models import Train, RouteTrainsStatus
+from tickets.models import Ticket, TrainTicketsStatus
+from routes.models import Route, RouteRailwayService, ChatRoute
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
 # pass env variables with db properties
-config.set_main_option('sqlalchemy.url', settings.DB_CONF.CONNECTION_URL)
+config.set_main_option("sqlalchemy.url", settings.DB_CONF.CONNECTION_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -91,9 +91,7 @@ async def run_async_migrations() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
-
-    """
+    """Run migrations in 'online' mode."""
     connectable = config.attributes.get("connection", None)
     if connectable is None:
         asyncio.run(run_async_migrations())

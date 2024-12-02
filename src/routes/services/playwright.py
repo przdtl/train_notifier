@@ -15,7 +15,9 @@ from routes.exceptions import RouteSearchURLNotSetError, RouteNotFoundError
 class AbstractRoutesParser(BaseRailwayTicketServiceParser, metaclass=ABCMeta):
     _service_route_search_url: str | None = None
 
-    async def parse(self, departure_st: str, arrival_st: str, date: datetime.date) -> str:
+    async def parse(
+        self, departure_st: str, arrival_st: str, date: datetime.date
+    ) -> str:
         """
         Парсит ссылку на страницу маршрута из точки ``departure_st`` в точку ``arrival_st`` на ``date`` число
 
@@ -75,39 +77,52 @@ class TutuRoutesParser(AbstractRoutesParser):
     _service_route_search_url = settings.TICKET_SERVICES.TUTU_CONF.SEARCH_ROUTES_URL
 
     async def _input_departure_station(self, departure_st: str) -> None:
-        departure_st_input = self._page.locator('xpath={}'.format(
-            settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.DEPARTURE_ST_INPUT
-        ))
+        departure_st_input = self._page.locator(
+            "xpath={}".format(
+                settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.DEPARTURE_ST_INPUT
+            )
+        )
         await departure_st_input.fill(departure_st)
 
     async def _input_arrival_station(self, arrival_st: str) -> None:
-        arrival_st_input = self._page.locator('xpath={}'.format(
-            settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.ARRIVAL_ST_INPUT
-        ))
+        arrival_st_input = self._page.locator(
+            "xpath={}".format(
+                settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.ARRIVAL_ST_INPUT
+            )
+        )
         await arrival_st_input.fill(arrival_st)
 
     async def _input_departure_date(self, date: datetime.date) -> None:
-        date_input = self._page.locator('xpath={}'.format(
-            settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.DATE_INPUT
-        ))
-        await date_input.fill(date.strftime('%d.%m.%Y'))
+        date_input = self._page.locator(
+            "xpath={}".format(
+                settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.DATE_INPUT
+            )
+        )
+        await date_input.fill(date.strftime("%d.%m.%Y"))
 
     async def _click_to_find_route_button(self) -> None:
-        find_button = self._page.locator('xpath={}'.format(
-            settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.SHOW_SCHEDULE_BUTTON
-        ))
+        find_button = self._page.locator(
+            "xpath={}".format(
+                settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.SHOW_SCHEDULE_BUTTON
+            )
+        )
         await find_button.click()
 
     async def _get_route_url(self) -> str:
         await asyncio.sleep(1)
 
         station_callout_page = self._page.url
-        if settings.TICKET_SERVICES.TUTU_CONF.TRAINS_LIST_PAGE_BASE_URL in station_callout_page:
+        if (
+            settings.TICKET_SERVICES.TUTU_CONF.TRAINS_LIST_PAGE_BASE_URL
+            in station_callout_page
+        ):
             return station_callout_page
 
-        show_route_button = self._page.locator('xpath={}'.format(
-            settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.SHOW_ROUTE_BUTTON
-        ))
+        show_route_button = self._page.locator(
+            "xpath={}".format(
+                settings.TICKET_SERVICES.TUTU_CONF.XPATH.ROUTES_PAGE.SHOW_ROUTE_BUTTON
+            )
+        )
         try:
             await show_route_button.click(timeout=40000)
         except TimeoutError:

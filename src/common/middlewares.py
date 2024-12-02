@@ -20,11 +20,11 @@ async def shutdown_playwright_browser() -> None:
 
 class StartShutdownMiddleware(TaskiqMiddleware):
     async def startup(self) -> None:
-        logger.info('The worker startup event has been started')
+        logger.info("The worker startup event has been started")
         await startup_playwright_browser()
-        logger.info('The worker startup event successfully completed')
+        logger.info("The worker startup event successfully completed")
 
     async def shutdown(self) -> None:
-        logger.info('The worker shutdown event has been started')
+        logger.info("The worker shutdown event has been started")
         await shutdown_playwright_browser()
-        logger.info('The worker shutdown event successfully completed')
+        logger.info("The worker shutdown event successfully completed")

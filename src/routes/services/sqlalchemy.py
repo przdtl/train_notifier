@@ -8,7 +8,12 @@ from common.types import RailwayTicketServices
 from routes.models import Route
 
 
-async def get_route_url(departure_st: str, arrival_st: str, date: datetime.date, ticket_service: RailwayTicketServices) -> str | None:
+async def get_route_info(
+    departure_st: str,
+    arrival_st: str,
+    date: datetime.date,
+    ticket_service: RailwayTicketServices,
+) -> Route | None:
     """
     Получает URL маршрута из базы данных по данным отправления, прибытия, дате и названию сервиса
 
@@ -24,22 +29,24 @@ async def get_route_url(departure_st: str, arrival_st: str, date: datetime.date,
 
     """
     async with async_session_maker() as session:
-        query = (
-            select(Route.url)
-            .where(
-                Route._from == departure_st,
-                Route.to == arrival_st,
-                Route.date == date,
-                Route.railway_ticket_service == ticket_service,
-            )
+        query = select(Route).where(
+            Route._from == departure_st,
+            Route.to == arrival_st,
+            Route.date == date,
+            Route.railway_ticket_service == ticket_service,
         )
-        result = await session.execute(query)
-        url = result.scalar_one_or_none()
+        route_query_result = await session.execute(query)
 
-        return url
+        return route_query_result.scalar_one_or_none()
 
 
-async def add_route(departure_st: str, arrival_st: str, date: datetime.date, url: str, ticket_service: RailwayTicketServices) -> None:
+async def add_route(
+    departure_st: str,
+    arrival_st: str,
+    date: datetime.date,
+    url: str,
+    ticket_service: RailwayTicketServices,
+) -> Route:
     """
     Добавляет новую запись о маршруте в базу данных
 
@@ -61,3 +68,9 @@ async def add_route(departure_st: str, arrival_st: str, date: datetime.date, url
         )
         session.add(new_route)
         await session.commit()
+
+        return Route
+
+
+async def get_user_routes(user_id: int) -> list[Route]:
+    pass

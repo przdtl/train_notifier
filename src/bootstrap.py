@@ -31,19 +31,17 @@ async def shutdown_taskiq() -> None:
 
 
 async def setup_telegram_webhook(bot: Bot) -> None:
-    webhook_url = '{}{}'.format(
+    webhook_url = "{}{}".format(
         settings.TELEGRAM_CONF.WEBHOOK_CONF.BASE_WEBHOOK_URL,
         settings.TELEGRAM_CONF.WEBHOOK_CONF.WEBHOOK_PATH,
     )
     is_webhook_set = await bot.set_webhook(webhook_url)
     logging_message = (
         'The webhook at "{}" has been successfully set'
-        if is_webhook_set else
-        'An error occurred during the installation of the Webhook with the address "{}"'
+        if is_webhook_set
+        else 'An error occurred during the installation of the Webhook with the address "{}"'
     )
-    logger.info(
-        logging_message.format(webhook_url)
-    )
+    logger.info(logging_message.format(webhook_url))
 
 
 async def shutdown_telegram_webhook(bot: Bot) -> None:
@@ -52,15 +50,15 @@ async def shutdown_telegram_webhook(bot: Bot) -> None:
 
 @dp.startup()
 async def setup_app(bot: Bot):
-    logger.info('The app startup event has been started')
+    logger.info("The app startup event has been started")
     await setup_taskiq()
     await setup_telegram_webhook(bot)
-    logger.info('The app startup event successfully completed ')
+    logger.info("The app startup event successfully completed ")
 
 
 @dp.shutdown()
 async def shutdown_app(bot: Bot):
-    logger.info('The app shutdown event has been started')
+    logger.info("The app shutdown event has been started")
     await shutdown_taskiq()
     await shutdown_telegram_webhook(bot)
-    logger.info('The app shutdown event successfully completed ')
+    logger.info("The app shutdown event successfully completed ")

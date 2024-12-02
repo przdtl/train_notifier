@@ -2,11 +2,27 @@ import re
 import datetime
 
 MONTHS = {
-    "янв": "Jan", "фев": "Feb", "мар": "Mar", "апр": "Apr", "май": "May", "июн": "Jun",
-    "июл": "Jul", "авг": "Aug", "сен": "Sep", "окт": "Oct", "ноя": "Nov", "дек": "Dec"
+    "янв": "Jan",
+    "фев": "Feb",
+    "мар": "Mar",
+    "апр": "Apr",
+    "май": "May",
+    "июн": "Jun",
+    "июл": "Jul",
+    "авг": "Aug",
+    "сен": "Sep",
+    "окт": "Oct",
+    "ноя": "Nov",
+    "дек": "Dec",
 }
 DAYS = {
-    "пн": "Mon", "вт": "Tue", "ср": "Wed", "чт": "Thu", "пт": "Fri", "сб": "Sat", "вс": "Sun"
+    "пн": "Mon",
+    "вт": "Tue",
+    "ср": "Wed",
+    "чт": "Thu",
+    "пт": "Fri",
+    "сб": "Sat",
+    "вс": "Sun",
 }
 
 
@@ -21,7 +37,7 @@ def parse_travel_time(time_str: str) -> datetime.timedelta:
         timedelta: Объект timedelta, представляющий общее время
 
     """
-    pattern = re.compile(r'~?(?:(\d+)\s*д)?\s*(?:(\d+)\s*ч)?\s*(?:(\d+)\s*м)?')
+    pattern = re.compile(r"~?(?:(\d+)\s*д)?\s*(?:(\d+)\s*ч)?\s*(?:(\d+)\s*м)?")
     match = pattern.search(time_str)
 
     if not match:
@@ -36,7 +52,7 @@ def parse_travel_time(time_str: str) -> datetime.timedelta:
 
 def make_naive(dt: datetime.datetime) -> datetime.datetime:
     """
-    Преобразует объект datetime с временной зоной (offset-aware) 
+    Преобразует объект datetime с временной зоной (offset-aware)
     в наивный объект datetime (без информации о временной зоне).
     Если переданный объект уже наивный, он возвращается без изменений
 

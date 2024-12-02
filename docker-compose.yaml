@@ -10,13 +10,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      taskiq_broker:
-        condition: service_healthy
-      taskiq_backend:
+      taskiq_redis:
         condition: service_healthy
       db:
         condition: service_healthy
-
 
   db:
     image: postgres:17-alpine
@@ -35,7 +32,7 @@ services:
     expose:
       - 5432
 
-  taskiq_backend:
+  taskiq_redis:
     image: redis:alpine
     container_name: TrainNotifierTaskiqRedisBackend
     healthcheck:
@@ -45,19 +42,6 @@ services:
     volumes:
       - redis_data:/data
 
-  taskiq_broker:
-    image: rabbitmq:4
-    container_name: TrainNotifierTaskiqRabbitMQBroker
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 30s
-      timeout: 30s
-      retries: 3
-    expose:
-      - 5672
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-
   taskiq_worker:
     build: .
     container_name: TrainNotifierTaskiqWorker
@@ -65,14 +49,11 @@ services:
     env_file:
       - .env
     depends_on:
-      taskiq_broker:
-        condition: service_healthy
-      taskiq_backend:
+      taskiq_redis:
         condition: service_healthy
       db:
         condition: service_healthy
         
 volumes:
   postgres_data:
-  rabbitmq_data:
   redis_data:

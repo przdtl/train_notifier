@@ -37,9 +37,11 @@ class ParserFactory(Generic[T]):
 
         self.parsers[service_name] = parser_class
 
-        logger.debug('A new parser "{}" has been added to the ParserFactory'.format(
-            parser_class.__name__
-        ))
+        logger.debug(
+            'A new parser "{}" has been added to the ParserFactory'.format(
+                parser_class.__name__
+            )
+        )
 
     def create_parser(self, name: RailwayTicketServices) -> T:
         """
@@ -62,8 +64,10 @@ class ParserFactory(Generic[T]):
 
         parser_instance = parser_class()
 
-        logger.debug('ParserFactory creates an instance of the "{}" class'.format(
-            parser_class.__name__
-        ))
+        logger.debug(
+            'ParserFactory creates an instance of the "{}" class'.format(
+                parser_class.__name__
+            )
+        )
 
         return parser_instance

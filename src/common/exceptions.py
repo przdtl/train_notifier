@@ -16,6 +16,6 @@ class ServiceNameNotSetError(PlaywrightError):
 
 class NoSuchParserInFactoryError(PlaywrightError):
     """
-    Исключение для случаев, когда совершается попытка получить парсер по имени, 
+    Исключение для случаев, когда совершается попытка получить парсер по имени,
     который не был зарегистрирован в фабрике
     """
